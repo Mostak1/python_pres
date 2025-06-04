@@ -21,7 +21,7 @@ class Patient(models.Model):
 
 class Manufacturer(models.Model):
     manufacturer_name = models.CharField(max_length=255)
-    slug = models.SlugField(unique=True, default='default-slug')
+    slug = models.SlugField(default='default-slug')
     generics_count = models.IntegerField(default=0)
     brand_names_count = models.IntegerField(default=0)
 
@@ -34,7 +34,7 @@ class Manufacturer(models.Model):
 
 class Generic(models.Model):
     generic_name = models.CharField(max_length=255)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(default='default-slug')
     monograph_link = models.URLField(blank=True, null=True)
     drug_class = models.CharField(max_length=255, blank=True, null=True)
     drug_class_id = models.IntegerField(blank=True, null=True)
@@ -73,7 +73,7 @@ class Drug(models.Model):
     image = models.ImageField(upload_to='drugs/', blank=True, null=True)
     is_inactive = models.BooleanField(default=False)
     drug_type = models.CharField(max_length=100, blank=True, null=True)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(default='default-slug')
     dosage_form_id = models.IntegerField(blank=True, null=True)
     generic = models.ForeignKey('Generic', on_delete=models.SET_NULL, blank=True, null=True)
     strength = models.CharField(max_length=100, blank=True, null=True)
@@ -91,7 +91,7 @@ class Drug(models.Model):
 
 class Indication(models.Model):
     indication_name = models.CharField(max_length=255)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(default='default-slug')
     generics_count = models.IntegerField(default=0)
 
     created_at = models.DateTimeField(auto_now_add=True, null=True)
@@ -103,7 +103,7 @@ class Indication(models.Model):
 class DosageForm(models.Model):
     dosage_form_name = models.CharField(max_length=255)
     short_name = models.CharField(max_length=50, blank=True, null=True)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(default='default-slug')
     brand_names_count = models.IntegerField(default=0)
 
     created_at = models.DateTimeField(auto_now_add=True, null=True)
@@ -113,7 +113,7 @@ class DosageForm(models.Model):
         return self.dosage_form_name
 class DrugClass(models.Model):
     drug_class_name = models.CharField(max_length=255)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(default='default-slug')
     generics_count = models.IntegerField(default=0)
 
     created_at = models.DateTimeField(auto_now_add=True, null=True)

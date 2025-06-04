@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drug List</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .filter-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-content {
+            border-radius: 0;
+            border: 1px solid #d3d3d3;
+        }
+
+        .modal-header {
+            background-color: #f5f5f5;
+            border-bottom: 1px solid #d3d3d3;
+        }
+
+        .modal-title {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-body h5 {
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+            color: #2c3e50;
+        }
+
+        .modal-body p {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .modal-body .section {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-left: 3px solid #2c3e50;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4">Drug List</h1>
+
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <form method="GET" action="">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label for="name" class="form-label">Drug Name</label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ name_filter }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="generic" class="form-label">Generic</label>
+                        <input type="text" class="form-control" id="generic" name="generic"
+                            value="{{ generic_filter }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="drug_class" class="form-label">Drug Class</label>
+                        <input type="text" class="form-control" id="drug_class" name="drug_class"
+                            value="{{ drug_class_filter }}">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="dosage_form" class="form-label">Dosage Form</label>
+                        <input type="text" class="form-control" id="dosage_form" name="dosage_form"
+                            value="{{ dosage_form_filter }}">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Filter</button>
+                <a href="{% url 'myapp:drug_list' %}" class="btn btn-secondary">Clear</a>
+            </form>
+        </div>
+
+        <!-- DataTable -->
+        <div class="table-container">
+            <table id="drugTable" class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Generic</th>
+                        <th>Strength</th>
+                        <th>Drug Type</th>
+                        <th>Package Size</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Leave tbody empty for DataTables to fill dynamically -->
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="drugModal" tabindex="-1" aria-labelledby="drugModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="drugModalLabel">Drug Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h5>Brand Name</h5>
+                    <p id="modal-name"></p>
+
+                    <h5>Generic Name</h5>
+                    <p id="modal-generic"></p>
+
+                    <h5>Drug Class</h5>
+                    <p id="modal-drug-class"></p>
+
+                    <div class="section">
+                        <h5>Indication</h5>
+                        <p id="modal-indication"></p>
+                        <p id="modal-indication-desc"></p>
+                    </div>
+
+                    <div class="section">
+                        <h5>Pharmacology</h5>
+                        <p id="modal-pharmacology"></p>
+                    </div>
+
+                    <div class="section">
+                        <h5>Dosage & Administration</h5>
+                        <p id="modal-dosage"></p>
+                        <p id="modal-administration"></p>
+                    </div>
+
+                    <div class="section">
+                        <h5>Interaction</h5>
+                        <p id="modal-interaction"></p>
+                    </div>
+
+                    <div class="section">
+                        <h5>Contraindications</h5>
+                        <p id="modal-contraindications"></p>
+                    </div>
+
+                    <div class="section">
+                        <h5>Side Effects</h5>
+                        <p id="modal-side-effects"></p>
+                    </div>
+
+                    <div class="section">
+                        <h5>Pregnancy & Lactation</h5>
+                        <p id="modal-pregnancy"></p>
+                    </div>
+
+                    <div class="section">
+                        <h5>Precautions & Warnings</h5>
+                        <p id="modal-precautions"></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        $(document).ready(function () {
+            // Initialize DataTable
+            $('#drugTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{% url 'myapp:drug_list_json' %}",
+                    data: function (d) {
+                        d.name = $('#name').val();
+                        d.generic = $('#generic').val();
+                        d.drug_class = $('#drug_class').val();
+                        d.dosage_form = $('#dosage_form').val();
+                    }
+                },
+                columns: [
+                    { data: 'name' },
+                    { data: 'generic' },
+                    { data: 'strength' },
+                    { data: 'drug_type' },
+                    { data: 'package_size' },
+                    { data: 'actions', orderable: false, searchable: false }
+                ]
+            });
+
+            // Refresh table on form submission
+            $('form').on('submit', function (e) {
+                e.preventDefault();
+                $('#drugTable').DataTable().ajax.reload();
+            });
+
+            // Handle View Details button click
+            $(document).on('click', '.view-details', function () {
+                const drugId = $(this).data('id');
+                const button = $(this);
+
+                // Show loading state
+                button.prop('disabled', true).text('Loading...');
+
+                // Make Ajax request to get drug details
+                $.ajax({
+                    url: `/myapp/drug/details/${drugId}/`,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.success) {
+                            const drug = response.data;
+
+                            // Populate modal with drug details
+                            $('#modal-name').html(drug.name || 'N/A');
+                            $('#modal-generic').html(drug.generic || 'N/A');
+                            $('#modal-drug-class').html(drug.drug_class || 'N/A');
+                            $('#modal-indication').html(drug.indication || 'N/A');
+                            $('#modal-indication-desc').html(drug.indication_desc || 'N/A');
+                            $('#modal-pharmacology').html(drug.pharmacology || 'N/A');
+                            $('#modal-dosage').html(drug.dosage || 'N/A');
+                            $('#modal-administration').html(drug.administration || 'N/A');
+                            $('#modal-interaction').html(drug.interaction || 'N/A');
+                            $('#modal-contraindications').html(drug.contraindications || 'N/A');
+                            $('#modal-side-effects').html(drug.side_effects || 'N/A');
+                            $('#modal-pregnancy').html(drug.pregnancy || 'N/A');
+                            $('#modal-precautions').html(drug.precautions || 'N/A');
+
+                            // Additional fields you can use
+                            $('#modal-manufacturer').html(drug.manufacturer || 'N/A');
+                            $('#modal-dosage-form').html(drug.dosage_form || 'N/A');
+                            $('#modal-strength').html(drug.strength || 'N/A');
+                            $('#modal-size').html(drug.size || 'N/A');
+                            $('#modal-drug-type').html(drug.drug_type || 'N/A');
+                            $('#modal-package-container').html(drug.package_container || 'N/A');
+                            $('#modal-package-size').html(drug.package_size || 'N/A');
+                            $('#modal-sku').html(drug.sku || 'N/A');
+
+                            // Show the modal
+                            $('#drugModal').modal('show');
+                        } else {
+                            alert('Error loading drug details: ' + response.error);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Ajax error:', error);
+                        alert('Failed to load drug details. Please try again.');
+                    },
+                    complete: function () {
+                        // Reset button state
+                        button.prop('disabled', false).text('View Details');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
